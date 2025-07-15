@@ -21,6 +21,11 @@ public class DataSeeder {
 
     @PostConstruct
     public void seedData() {
+        if (studentRepository.count() > 0) {
+            System.out.println("Dữ liệu đã tồn tại, bỏ qua seed.");
+            return;
+        }
+
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(getClass().getResourceAsStream("/diem_thi_thpt_2024.csv"), StandardCharsets.UTF_8))) {
 
