@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+hs_err_pid22756.log
+hs_err_pid22756.jfr

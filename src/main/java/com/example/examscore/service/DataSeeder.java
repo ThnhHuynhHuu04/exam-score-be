@@ -52,6 +52,7 @@ public class DataSeeder {
                 );
 
                 studentRepository.save(student);
+                System.out.println("Student added: " + student.getRegNumber());
             }
 
             System.out.println(" Dữ liệu đã được load thành công.");
