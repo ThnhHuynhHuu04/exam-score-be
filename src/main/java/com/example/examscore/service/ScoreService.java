@@ -6,7 +6,9 @@ import dto.SubjectStatDTO;
 import dto.TopStudentWithSubjectDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -80,6 +82,12 @@ public class ScoreService {
                     ((Number)row[4]).doubleValue()
             );
         }).toList();
+    }
+
+    @Scheduled(cron = "0 0/15 * * * *") // mỗi 15 phút
+    @Transactional
+    public void refreshScoreStatView() {
+        studentRepository.refreshScoreDistributionView();
     }
 
 }
