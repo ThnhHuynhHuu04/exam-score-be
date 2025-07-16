@@ -1,8 +1,11 @@
 # Multi-stage build để giảm kích thước image
-FROM openjdk:17-jdk-slim as builder
+FROM eclipse-temurin:17-jdk-alpine AS builder
 
 # Thiết lập working directory
 WORKDIR /app
+
+# Set environment variables for Maven
+ENV MAVEN_OPTS="-Dfile.encoding=UTF-8 -Dproject.build.sourceEncoding=UTF-8"
 
 # Copy Maven wrapper và pom.xml
 COPY mvnw .
@@ -10,17 +13,23 @@ COPY mvnw.cmd .
 COPY .mvn .mvn
 COPY pom.xml .
 
+# Make mvnw executable
+RUN chmod +x ./mvnw
+
 # Download dependencies
 RUN ./mvnw dependency:go-offline -B
 
 # Copy source code
 COPY src src
 
-# Build application
-RUN ./mvnw clean package -DskipTests
+# Build application với encoding UTF-8
+RUN ./mvnw clean package -DskipTests -Dfile.encoding=UTF-8 -Dproject.build.sourceEncoding=UTF-8
 
 # Final stage
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-jre-alpine
+
+# Install curl cho health check
+RUN apk add --no-cache curl
 
 # Thiết lập working directory
 WORKDIR /app
@@ -29,7 +38,7 @@ WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 
 # Tạo user non-root để chạy application
-RUN addgroup --system spring && adduser --system spring --ingroup spring
+RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
 # Expose port
