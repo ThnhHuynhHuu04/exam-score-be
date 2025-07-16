@@ -5,6 +5,7 @@ package com.example.examscore.service;
 import com.example.examscore.model.Student;
 import com.example.examscore.repository.StudentRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +22,15 @@ public class DataSeeder {
 
     private final StudentRepository studentRepository;
 
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
     @PostConstruct
+    public void init() {
+        System.out.println("Starting data seeder");
+        executorService.submit(this::seedData);
+    }
+
+    @Transactional
     public void seedData() {
         System.out.println("Bắt đầu kiểm tra và seed dữ liệu...");
 
@@ -44,7 +55,7 @@ public class DataSeeder {
 
                     String regNumber = fields[0];
                     
-                    // Kiểm tra xem student đã tồn tại chưa
+
                     if (studentRepository.existsByRegNumber(regNumber)) {
                         skippedCount++;
                         continue;
@@ -73,7 +84,7 @@ public class DataSeeder {
                 } catch (Exception e) {
                     errorCount++;
                     System.err.println("Lỗi khi xử lý dòng: " + line + " - " + e.getMessage());
-                    // Tiếp tục với dòng tiếp theo thay vì dừng
+
                 }
             }
 
@@ -85,6 +96,10 @@ public class DataSeeder {
             
         } catch (Exception e) {
             System.err.println("Lỗi khi đọc file CSV: " + e.getMessage());
+        }
+        finally {
+            executorService.shutdown();
+            System.out.println("Finished data seeder");
         }
     }
 
