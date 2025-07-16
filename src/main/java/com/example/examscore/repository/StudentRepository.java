@@ -13,6 +13,8 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     Optional<Student> findByRegNumber(String regNumber);
 
+    boolean existsByRegNumber(String regNumber);
+
     @Query(value = """
         SELECT 'math' AS subject,
                COUNT(CASE WHEN math >= 8 THEN 1 END) AS level_above_8,

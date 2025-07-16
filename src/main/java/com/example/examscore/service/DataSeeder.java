@@ -21,16 +21,16 @@ public class DataSeeder {
 
     @PostConstruct
     public void seedData() {
-        if (studentRepository.count() > 0) {
-            System.out.println("Dữ liệu đã tồn tại, bỏ qua seed.");
-            return;
-        }
+        System.out.println("Bắt đầu kiểm tra và seed dữ liệu...");
 
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(getClass().getResourceAsStream("/diem_thi_thpt_2024.csv"), StandardCharsets.UTF_8))) {
 
             String line;
             boolean isFirstLine = true;
+            int addedCount = 0;
+            int skippedCount = 0;
+            int errorCount = 0;
 
             while ((line = reader.readLine()) != null) {
                 if (isFirstLine) {
@@ -38,31 +38,53 @@ public class DataSeeder {
                     continue;
                 }
 
-                String[] fields = line.split(",",-1);
+                try {
+                    String[] fields = line.split(",",-1);
+                    fields = Arrays.copyOf(fields,11);
 
-                fields = Arrays.copyOf(fields,11);
+                    String regNumber = fields[0];
+                    
+                    // Kiểm tra xem student đã tồn tại chưa
+                    if (studentRepository.existsByRegNumber(regNumber)) {
+                        skippedCount++;
+                        continue;
+                    }
 
-                Student student = new Student(
-                        fields[0], // regNumber
-                        parseDouble(fields[1]), // math
-                        parseDouble(fields[2]), // literature
-                        parseDouble(fields[3]), // foreignLanguage
-                        parseDouble(fields[4]), // physics
-                        parseDouble(fields[5]), // chemistry
-                        parseDouble(fields[6]), // biology
-                        parseDouble(fields[7]), // history
-                        parseDouble(fields[8]), // geography
-                        parseDouble(fields[9]), // civicEducation
-                        fields[10].isBlank() ? null : fields[10]              // foreignId
-                );
+                    Student student = new Student(
+                            regNumber, // regNumber
+                            parseDouble(fields[1]), // math
+                            parseDouble(fields[2]), // literature
+                            parseDouble(fields[3]), // foreignLanguage
+                            parseDouble(fields[4]), // physics
+                            parseDouble(fields[5]), // chemistry
+                            parseDouble(fields[6]), // biology
+                            parseDouble(fields[7]), // history
+                            parseDouble(fields[8]), // geography
+                            parseDouble(fields[9]), // civicEducation
+                            fields[10].isBlank() ? null : fields[10]              // foreignId
+                    );
 
-                studentRepository.save(student);
-                System.out.println("Student added: " + student.getRegNumber());
+                    studentRepository.save(student);
+                    addedCount++;
+                    
+                    if (addedCount % 1000 == 0) {
+                        System.out.println("Đã thêm " + addedCount + " students...");
+                    }
+                } catch (Exception e) {
+                    errorCount++;
+                    System.err.println("Lỗi khi xử lý dòng: " + line + " - " + e.getMessage());
+                    // Tiếp tục với dòng tiếp theo thay vì dừng
+                }
             }
 
-            System.out.println(" Dữ liệu đã được load thành công.");
+            System.out.println("=== KẾT QUẢ SEED ===");
+            System.out.println("Đã thêm: " + addedCount + " students");
+            System.out.println("Đã bỏ qua (tồn tại): " + skippedCount + " students");
+            System.out.println("Lỗi: " + errorCount + " dòng");
+            System.out.println("Tổng số students trong DB: " + studentRepository.count());
+            
         } catch (Exception e) {
-            System.err.println(" Lỗi khi đọc file CSV: " + e.getMessage());
+            System.err.println("Lỗi khi đọc file CSV: " + e.getMessage());
         }
     }
 
