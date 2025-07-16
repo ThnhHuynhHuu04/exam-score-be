@@ -78,4 +78,14 @@ public interface StudentRepository extends JpaRepository<Student, String> {
         FROM student
         """, nativeQuery = true)
     List<Object[]> fetchScoreDistribution();
+
+    @Query(value = """
+    SELECT reg_number, math, physics, chemistry,
+           (math + physics + chemistry) AS total_score
+    FROM student
+    WHERE math IS NOT NULL AND physics IS NOT NULL AND chemistry IS NOT NULL
+    ORDER BY total_score DESC
+    LIMIT 10
+    """, nativeQuery = true)
+    List<Object[]> findTop10GroupAStudents();
 }
