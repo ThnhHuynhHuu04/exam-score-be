@@ -2,12 +2,15 @@ package com.example.examscore.controller;
 
 import com.example.examscore.model.Student;
 import com.example.examscore.service.ScoreService;
+import dto.SubjectStatDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,6 +21,11 @@ public class ScoreController {
     @GetMapping("{id}")
     public ResponseEntity<Student> getScore(@PathVariable String id) {
         return ResponseEntity.ok(scoreService.getStudentById(id));
+    }
+
+    @GetMapping("/score-stat")
+    public ResponseEntity<List<SubjectStatDTO>> getScoreDistribution() {
+        return ResponseEntity.ok(scoreService.getScoreStat());
     }
 
 }
