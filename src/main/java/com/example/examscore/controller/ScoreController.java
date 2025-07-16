@@ -16,7 +16,7 @@ import java.util.List;
 public class ScoreController {
     private final ScoreService scoreService;
 
-    @GetMapping("{id}")
+    @GetMapping("/score/{id}")
     public ResponseEntity<Student> getScore(@PathVariable String id) {
         return ResponseEntity.ok(scoreService.getStudentById(id));
     }
