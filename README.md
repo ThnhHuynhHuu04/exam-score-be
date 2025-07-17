@@ -1,5 +1,7 @@
 # ExamScore
 
+Demo online: [https://exam-score-be.onrender.com](https://exam-score-be.onrender.com)
+
 Ứng dụng quản lý và phân tích điểm thi THPT Quốc Gia 2024.
 
 ## Tính năng chính
@@ -39,6 +41,7 @@ docker-compose -f docker-compose.prod.yml up --build
 ### 3. Truy cập ứng dụng
 
 - API chạy tại: `http://localhost:8080`
+- Demo online: [https://exam-score-be.onrender.com](https://exam-score-be.onrender.com)
 
 ## Cấu trúc thư mục
 
