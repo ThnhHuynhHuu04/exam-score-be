@@ -16,6 +16,14 @@ import java.util.List;
 public class ScoreController {
     private final ScoreService scoreService;
 
+    @GetMapping
+    public String home() {
+        return "<html>"
+                + "<h2>Chào mừng đến với ExamScore API!</h2>"
+                + "<p>Để xem tài liệu và thử API, hãy truy cập <a href='/swagger-ui/index.html' target='_blank'>Swagger UI</a>.</p>"
+                + "</html>";
+    }
+
     @GetMapping("/score/{id}")
     public ResponseEntity<Student> getScore(@PathVariable String id) {
         return ResponseEntity.ok(scoreService.getStudentById(id));
